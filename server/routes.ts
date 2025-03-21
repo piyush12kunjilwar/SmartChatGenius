@@ -82,12 +82,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userMessage,
         assistantMessage
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in chat completion:", error);
       
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ error: validationError.message });
+      }
+      
+      // Handle OpenAI API errors more specifically
+      if (error?.error?.type === 'insufficient_quota' || error?.status === 429) {
+        console.log('OpenAI API quota exceeded, returning 429 status');
+        return res.status(429).json({ 
+          error: "OpenAI API rate limit exceeded. Please check your API key quota.",
+          type: "rate_limit_exceeded"
+        });
       }
       
       res.status(500).json({ error: "Failed to process chat completion" });

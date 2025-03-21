@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import ChatInterface from "@/components/ChatInterface";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@shared/schema";
 
@@ -21,10 +21,10 @@ export default function Home() {
   
   // Query to get chat history
   const { 
-    data: messages, 
+    data: messages = [], 
     isLoading: isLoadingMessages,
     refetch: refetchMessages
-  } = useQuery({
+  } = useQuery<ChatMessage[]>({
     queryKey: [`/api/chat/${sessionId}`],
     enabled: !!sessionId
   });
@@ -41,12 +41,21 @@ export default function Home() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/chat/${sessionId}`] });
     },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive"
-      });
+    onError: (error: any) => {
+      // Check if it's an OpenAI API rate limit error
+      if (error?.response?.status === 429 || error?.response?.data?.type === 'rate_limit_exceeded') {
+        toast({
+          title: "API Limit Exceeded",
+          description: "OpenAI API quota exceeded. Please try again later or update your API key.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive"
+        });
+      }
       console.error("Error sending message:", error);
     }
   });
