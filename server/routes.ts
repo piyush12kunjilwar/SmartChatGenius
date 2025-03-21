@@ -99,6 +99,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle authentication errors
+      if (error?.error?.code === 'invalid_api_key' || error?.status === 401) {
+        console.log('OpenAI API authentication error, returning 401 status');
+        return res.status(401).json({
+          error: "Invalid API key provided. Please check your OpenAI API key.",
+          type: "authentication_error"
+        });
+      }
+      
       res.status(500).json({ error: "Failed to process chat completion" });
     }
   });

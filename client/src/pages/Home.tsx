@@ -49,7 +49,16 @@ export default function Home() {
           description: "OpenAI API quota exceeded. Please try again later or update your API key.",
           variant: "destructive"
         });
-      } else {
+      } 
+      // Check if it's an authentication error
+      else if (error?.response?.status === 401 || error?.response?.data?.type === 'authentication_error') {
+        toast({
+          title: "Authentication Error",
+          description: "Invalid OpenAI API key. Please update your API key with a valid key.",
+          variant: "destructive"
+        });
+      }
+      else {
         toast({
           title: "Error",
           description: "Failed to send message. Please try again.",
