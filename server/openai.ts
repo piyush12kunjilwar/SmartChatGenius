@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || "sk-your-api-key"
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 export type Message = {
@@ -36,7 +36,9 @@ export async function generateChatResponse(
     return response.choices[0].message.content || "I'm not sure how to respond to that.";
   } catch (error) {
     console.error("Error generating chat response:", error);
-    return "I'm sorry, I encountered an error while processing your request. Please try again later.";
+    
+    // Re-throw the error to be handled by the router
+    throw error;
   }
 }
 
