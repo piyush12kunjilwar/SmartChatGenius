@@ -19,6 +19,19 @@ export default function Home() {
   
   const { toast } = useToast();
   
+  // Show status message that we're in demo mode
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      toast({
+        title: "Demo Mode Active",
+        description: "The chatbot is running in demo mode with mock responses. Provide an OpenAI API key for full functionality.",
+        duration: 5000,
+      });
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [toast]);
+  
   // Query to get chat history
   const { 
     data: messages = [], 

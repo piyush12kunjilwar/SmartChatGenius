@@ -19,10 +19,46 @@ Maintain context from the conversation history.`;
 /**
  * Generate a response from OpenAI based on the conversation history
  */
+// Flag to enable/disable mock mode (temporary until valid API key is provided)
+const USE_MOCK_RESPONSES = true;
+
+// Mock response generator
+function generateMockResponse(messages: Message[]): string {
+  // Get the last user message
+  const lastUserMessage = [...messages].reverse().find(msg => msg.role === "user");
+  
+  if (!lastUserMessage) {
+    return "I'm here to help. What would you like to know?";
+  }
+  
+  const userMessage = lastUserMessage.content.toLowerCase();
+  
+  // Simple pattern matching for common questions
+  if (userMessage.includes("hello") || userMessage.includes("hi")) {
+    return "Hello! I'm your friendly AI assistant. How can I help you today?";
+  } else if (userMessage.includes("how are you")) {
+    return "I'm functioning well, thank you for asking! How can I assist you?";
+  } else if (userMessage.includes("weather")) {
+    return "I don't have access to real-time weather data. You would need to check a weather service for that information.";
+  } else if (userMessage.includes("name")) {
+    return "I'm an AI assistant created to help answer your questions and engage in conversation.";
+  } else if (userMessage.includes("thank")) {
+    return "You're welcome! Feel free to ask if you need anything else.";
+  } else {
+    return "That's an interesting question. In a fully functioning system, I would provide a detailed response using the OpenAI API. Currently, I'm operating in demo mode without API access.";
+  }
+}
+
 export async function generateChatResponse(
   messages: Message[]
 ): Promise<string> {
   try {
+    // If in mock mode, return a mock response
+    if (USE_MOCK_RESPONSES) {
+      console.log("Using mock response generator (no valid API key available)");
+      return generateMockResponse(messages);
+    }
+    
     // Add system message at the beginning if not present
     const fullMessages = messages[0]?.role === "system" 
       ? [...messages] 
