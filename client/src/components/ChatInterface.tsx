@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { Bot, RefreshCw, Paperclip, Send } from "lucide-react";
-import MessageBubble from "./MessageBubble";
-import TypingIndicator from "./TypingIndicator";
+import { RefreshCw } from "lucide-react";
+import AnimatedMessageBubble from "./AnimatedMessageBubble";
+import EnhancedTypingIndicator from "./EnhancedTypingIndicator";
 import ChatInput from "./ChatInput";
 import { ChatMessage } from "@shared/schema";
 import { motion } from "framer-motion";
+import AnimatedHeader from "./AnimatedHeader";
+import AnimatedBackground from "./AnimatedBackground";
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];
@@ -29,71 +31,72 @@ export default function ChatInterface({
   }, [messages, isLoading]);
 
   return (
-    <div className="chat-container h-screen flex flex-col bg-neutral-50 text-neutral-900">
-      {/* Header */}
-      <header className="bg-white border-b border-neutral-200 p-4 shadow-sm z-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <motion.div 
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white"
-            >
-              <Bot className="h-5 w-5" />
-            </motion.div>
-            <div>
-              <h1 className="font-semibold text-lg">AI Assistant</h1>
-              <div className="flex items-center text-xs text-neutral-500">
-                <span className="flex h-2 w-2 relative mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary-500"></span>
-                </span>
-                Online
-              </div>
+    <div className="chat-container relative h-screen flex flex-col bg-white text-neutral-900 overflow-hidden">
+      {/* 3D Animated Background */}
+      <AnimatedBackground />
+      
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Enhanced 3D Header */}
+        <header className="bg-white bg-opacity-80 backdrop-blur-sm border-b border-neutral-200 p-4 shadow-sm">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between">
+              <AnimatedHeader isAiResponding={isLoading} />
+              <motion.button 
+                onClick={onResetChat}
+                className="text-blue-600 hover:text-blue-800 transition-colors p-3 rounded-full hover:bg-blue-50 shadow-sm"
+                aria-label="Reset chat"
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                transition={{ duration: 0.5 }}
+              >
+                <RefreshCw className="h-5 w-5" />
+              </motion.button>
             </div>
           </div>
-          <div>
-            <button 
-              onClick={onResetChat}
-              className="text-neutral-500 hover:text-neutral-700 transition-colors p-2 rounded-full hover:bg-neutral-100"
-              aria-label="Reset chat"
-            >
-              <RefreshCw className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Messages Container */}
-      <div 
-        ref={messagesContainerRef}
-        className="messages-container flex-1 px-4 py-6 overflow-y-auto bg-neutral-50 scroll-smooth"
-      >
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              message={message}
+        {/* Enhanced Messages Container with 3D effect */}
+        <motion.div 
+          ref={messagesContainerRef}
+          className="messages-container flex-1 px-4 py-6 overflow-y-auto scroll-smooth"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="max-w-4xl mx-auto space-y-6">
+            {messages.map((message) => (
+              <AnimatedMessageBubble
+                key={message.id}
+                message={message}
+              />
+            ))}
+
+            {isLoading && (
+              <EnhancedTypingIndicator />
+            )}
+          </div>
+        </motion.div>
+
+        {/* Enhanced Input Area */}
+        <motion.div 
+          className="bg-white bg-opacity-95 backdrop-blur-sm border-t border-neutral-200 p-4 shadow-lg"
+          initial={{ y: 50 }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          <div className="max-w-4xl mx-auto">
+            <ChatInput 
+              onSendMessage={onSendMessage}
+              isLoading={isLoading}
             />
-          ))}
-
-          {isLoading && (
-            <TypingIndicator />
-          )}
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="bg-white border-t border-neutral-200 p-4">
-        <div className="max-w-4xl mx-auto">
-          <ChatInput 
-            onSendMessage={onSendMessage}
-            isLoading={isLoading}
-          />
-          <div className="text-xs text-neutral-400 mt-2 text-center">
-            Our AI assistant uses natural language processing to provide helpful responses.
+            <motion.div 
+              className="text-xs text-neutral-500 mt-2 text-center"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              Our AI assistant uses advanced 3D natural language processing to provide interactive responses.
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
