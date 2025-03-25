@@ -175,3 +175,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - OpenAI for providing the language model API
 - Framer Motion for animation utilities
 - shadcn/ui for accessible component designs
+
+  Created with ❤️ by Piyush Kunjilwar
